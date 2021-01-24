@@ -1,0 +1,53 @@
+all: clean FormatSCSI ChkSCSI MountSCSI MacSCSI BootSCSI
+		echo done
+
+clean:
+		rm FormatSCSI MountSCSI MacSCSI BootSCSI ChkSCSI
+		rm TestSCSI MSCSI
+		rm *.bak
+
+print:
+		cat makefile > .bout
+		cat newpage > .bout
+		cat sl1410.c > .bout
+		cat newpage > .bout
+		cat np_fmt.c > .bout
+		cat newpage > .bout
+		cat np_dvr.c > .bout
+		cat newpage > .bout
+		cat newpage > .bout
+
+FormatSCSI:
+		cc np_fmt.c
+		cc s1410.c
+		ln -mo FormatSCSI np_fmt.o s1410.o sys:lib/mixcroot.o -lc
+		cprsrc DRVR 30 sys:system FormatSCSI
+		rm np_fmt.o s1410.o
+
+ChkSCSI:
+		cc np_chk.c
+		cc sl410.c
+		In -mo ChkSCSI np_chk.o sl410.o sys:lib/mixcroot.o -lc
+		cprsrc DRVR 30 sys:system ChkSCSI
+		rm np_chk.o si410.0
+
+MacSCSI:
+		cc -bu np_dvr.c
+		cc -bu s1410.c
+		ln -d -n MacSCSI -I 28 -R 40 np_dvr.o s1410.o -lc -o MacSCSI
+		cprsrc DRVR 28 MacSCSI TestSCSI
+		rm np_dvr.p s1410.o
+
+MountSCSI:
+		cc mountscsi.c
+		In -mo MountSCSI mountscsi.o sys:1ib/mixcroot.o -lc
+		cprsrc DRVR 30 sys:system MountSCSI
+		cp -f MountSCSI MSCSI
+		cprsrc DRVR 28 MacSCSI MountSCSI
+		rm mountscsi.o
+
+BootSCSI:
+		cc bootscsi.c
+		In -mo BootSCSI bootscsi.o sys:1ib/mixcroot.o -lc
+		cprsrc DRVR 30 sys:system BootSCSI
+		rm bootscsi.o
